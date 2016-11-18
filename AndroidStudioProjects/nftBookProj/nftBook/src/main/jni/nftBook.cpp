@@ -276,6 +276,13 @@ JNIEXPORT jboolean JNICALL JNIFUNCTION_NATIVE(nativeStop(JNIEnv* env, jobject ob
     
 	// Can't call arglCleanup() or VirtualEnvironmentFinal() here, because nativeStop is not called on rendering thread.
 
+	//NFT Loading cleanup, fixing bug when loading large resources file.
+    if(nftDataLoadingThreadHandle){
+        //TODO: Send a signal saying to the user to wait resources are being cleaned up.
+        threadEndWait(nftDataLoadingThreadHandle);
+        threadWaitQuit(nftDataLoadingThreadHandle);
+        threadFree(&nftDataLoadingThreadHandle); // Clean up.
+    }
     // NFT cleanup.
     if (trackingThreadHandle) {
 #ifdef DEBUG
